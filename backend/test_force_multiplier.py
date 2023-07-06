@@ -1,11 +1,10 @@
 import asyncio
-import json
 import unittest
 from types import SimpleNamespace
 from unittest.mock import patch
 
-from backend.force_multiplier import apply_feedback, get_diff, remove_newlines, get_completion, \
-    InadequateFeedbackException, process_result, apply_diff
+from backend.classes import InadequateFeedbackException
+from backend.force_multiplier import apply_feedback, get_diff, get_completion
 
 
 class MyTestCase(unittest.TestCase):
@@ -15,15 +14,10 @@ class MyTestCase(unittest.TestCase):
             result = asyncio.run(apply_feedback('', True, '', ''))
             self.assertEquals(to_compare, result)
 
-
     def test_get_diff_should_return_simplenamespace(self):
         with patch('backend.force_multiplier.get_completion', return_value='{}'):
             result = asyncio.run(get_diff('{}', True, '', ''))
             self.assertTrue(isinstance(result, SimpleNamespace))
-    def test_remove_new_lines(self):
-        text = 'test\n'
-        result = remove_newlines(text)
-        self.assertEquals('test', result)
 
     def test_get_completion_should_return_process_result(self):
         pass

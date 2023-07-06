@@ -1,9 +1,10 @@
 import logging
 import os
 from types import SimpleNamespace
-import openai
 import json
 
+from classes import InadequateFeedbackException
+from utils import StringUtils, OpenAIUtils
 from mock import get_mock_completion
 from prompts import get_system_prompt, get_openai_functions, get_user_prompt
 
@@ -32,12 +33,7 @@ async def get_diff(document, document_is_code, feedback, api_key):
     completion = get_mock_completion(document) if MOCK_COMPLETION else await get_completion(messages, api_key)
     logging.info(completion)
 
-    return json.loads(remove_newlines(completion), object_hook=lambda d: SimpleNamespace(**d))
-
-
-def remove_newlines(string):
-    return string.replace('\n', '')
-
+    return json.loads(StringUtils.remove_newlines(completion), object_hook=lambda d: SimpleNamespace(**d))
 
 async def get_completion(messages, api_key):
     arguments = {
@@ -51,7 +47,7 @@ async def get_completion(messages, api_key):
     if USE_OPENAI_FUNCTIONS:
         arguments["functions"] = get_openai_functions()
 
-    res = await openai.ChatCompletion.acreate(**arguments)
+    res = OpenAIUtils.completion(**arguments)
     first_choice = res.choices[0]
 
     try:
@@ -91,9 +87,3 @@ def apply_diff(document, diff):
                 document = document[:block_start_index] + replacement + remaining_document[block_end_index:]
 
     return document
-
-
-class InadequateFeedbackException(Exception):
-    def __init__(self, message):
-        self.message = message
-        super().__init__(self.message)

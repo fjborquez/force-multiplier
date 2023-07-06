@@ -7,7 +7,7 @@ from openai.error import AuthenticationError
 from starlette.responses import RedirectResponse
 
 from backend.force_multiplier import InadequateFeedbackException
-from backend.main import transcribe_audio, modify_document, DocumentFeedback, document, feedback, _decode
+from backend.main import transcribe_audio, modify_document, DocumentFeedback, document, feedback
 
 
 class TestMain(unittest.TestCase):
@@ -44,11 +44,6 @@ class TestMain(unittest.TestCase):
     def test_feedback_should_return_a_redirect_response(self):
         result = asyncio.run(feedback())
         self.assertTrue(isinstance(result, RedirectResponse))
-
-    def test_decode_should_return_base64_decoded_string(self):
-        to_compare = 'prueba'
-        result = _decode('cHJ1ZWJh')
-        self.assertEquals(to_compare, result)
 
 
 if __name__ == '__main__':
